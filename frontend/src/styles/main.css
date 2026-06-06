@@ -1,0 +1,179 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 全局基础样式 */
+html, body, #app {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'PingFang SC', 'Microsoft YaHei', system-ui, -apple-system, sans-serif;
+  background: #f8fafc;
+  color: #1e293b;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* 禁止 iOS 弹性滚动 */
+  overscroll-behavior-y: none;
+}
+
+* {
+  box-sizing: border-box;
+  /* 移除移动端点击高亮 */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 按钮等可点击元素恢复点击反馈（仅用 :active） */
+button, a, [role="button"] {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* 输入框允许选中 */
+input, textarea {
+  -webkit-user-select: auto;
+  user-select: auto;
+}
+
+/* iOS 输入框默认样式重置 */
+input, textarea, select {
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 0;
+}
+
+/* 全局输入框最小字号 16px（避免 iOS 自动缩放） */
+@layer base {
+  input, select, textarea {
+    font-size: 16px;
+  }
+  @media (min-width: 640px) {
+    input, select, textarea {
+      font-size: 14px;
+    }
+  }
+}
+
+/* 自定义滚动条 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* 通用组件类 */
+@layer components {
+  .glass-card {
+    @apply bg-white/80 backdrop-blur-xl border border-white/40 shadow-xl;
+  }
+
+  .btn-primary {
+    @apply bg-gradient-to-r from-brand-500 to-purple-500 text-white
+           font-semibold rounded-xl shadow-lg shadow-brand-500/30
+           hover:shadow-xl hover:shadow-brand-500/40
+           active:scale-[0.98] transition-all duration-200;
+  }
+
+  .btn-ghost {
+    @apply text-gray-600 hover:text-brand-600 hover:bg-brand-50
+           rounded-lg transition-colors duration-200;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3 rounded-xl border border-gray-200
+           bg-white/70 backdrop-blur
+           focus:outline-none focus:ring-2 focus:ring-brand-400
+           focus:border-transparent transition-all;
+  }
+
+  .gradient-text {
+    @apply bg-gradient-to-r from-brand-600 via-purple-600 to-pink-600
+           bg-clip-text text-transparent;
+  }
+}
+
+/* 卡片翻转动画 */
+.flip-enter-active,
+.flip-leave-active {
+  transition: all 0.4s ease;
+}
+.flip-enter-from {
+  opacity: 0;
+  transform: rotateY(90deg);
+}
+.flip-leave-to {
+  opacity: 0;
+  transform: rotateY(-90deg);
+}
+
+/* 渐变背景 */
+.bg-mesh {
+  background-color: #6366f1;
+  background-image:
+    radial-gradient(at 20% 20%, rgba(99, 102, 241, 0.6) 0px, transparent 50%),
+    radial-gradient(at 80% 30%, rgba(168, 85, 247, 0.5) 0px, transparent 50%),
+    radial-gradient(at 50% 80%, rgba(236, 72, 153, 0.5) 0px, transparent 50%);
+}
+
+/* 错误抖动 */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-6px); }
+  20%, 40%, 60%, 80% { transform: translateX(6px); }
+}
+.animate-shake {
+  animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+/* 软脉冲 */
+@keyframes pulse-soft {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+}
+.animate-pulse-soft {
+  animation: pulse-soft 1.5s ease-in-out infinite;
+}
+
+/* 正确反馈 */
+@keyframes bounce-in {
+  0% { transform: scale(0.3); opacity: 0; }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); opacity: 1; }
+}
+.animate-bounce-in {
+  animation: bounce-in 0.4s ease-out;
+}
+
+/* 模式切换淡入 */
+@keyframes fade-slide-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-slide {
+  animation: fade-slide-up 0.3s ease-out;
+}
+
+/* 通用淡入 */
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.2s;
+}
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+}
+
+/* kbd 标签样式 */
+kbd {
+  font-family: 'Menlo', 'Consolas', monospace;
+}
