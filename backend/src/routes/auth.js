@@ -16,12 +16,12 @@ router.post('/register', async (req, res) => {
   if (password.length < 6) {
     return res.status(400).json({ error: '密码至少 6 位' })
   }
-  const exists = db.prepare('SELECT id FROM users WHERE username = ?').get(username)
+  const exists = await db.prepare('SELECT id FROM users WHERE username = ?').get(username)
   if (exists) {
     return res.status(400).json({ error: '该用户名已被使用' })
   }
   const hash = await bcrypt.hash(password, 10)
-  const result = db.prepare(
+  const result = await db.prepare(
     'INSERT INTO users (username, password) VALUES (?, ?)'
   ).run(username, hash)
   const user = { id: result.lastInsertRowid, username, avatar: '🧑‍🎓' }
@@ -34,7 +34,7 @@ router.post('/login', async (req, res) => {
   if (!username || !password) {
     return res.status(400).json({ error: '请输入用户名和密码' })
   }
-  const row = db.prepare('SELECT * FROM users WHERE username = ?').get(username)
+  const row = await db.prepare('SELECT * FROM users WHERE username = ?').get(username)
   if (!row) return res.status(401).json({ error: '用户名或密码错误' })
   const ok = await bcrypt.compare(password, row.password)
   if (!ok) return res.status(401).json({ error: '用户名或密码错误' })
@@ -43,8 +43,8 @@ router.post('/login', async (req, res) => {
   res.json({ token, user })
 })
 
-router.get('/me', authMiddleware, (req, res) => {
-  const row = db.prepare('SELECT id, username, email, avatar, level FROM users WHERE id = ?').get(req.user.id)
+router.get('/me', authMiddleware, async (req, res) => {
+  const row = await db.prepare('SELECT id, username, email, avatar, level FROM users WHERE id = ?').get(req.user.id)
   if (!row) return res.status(404).json({ error: '用户不存在' })
   res.json({ user: row })
 })

@@ -1,8 +1,12 @@
 import axios from 'axios'
 
 // 创建 axios 实例
+// 开发环境：使用 Vite 代理（/api -> http://localhost:3000）
+// 生产环境：使用 VITE_API_BASE 环境变量（线上后端地址）
 const request = axios.create({
-  baseURL: '/api',
+  baseURL: import.meta.env.VITE_API_BASE
+    ? `${import.meta.env.VITE_API_BASE}/api`
+    : '/api',
   timeout: 15000
 })
 
