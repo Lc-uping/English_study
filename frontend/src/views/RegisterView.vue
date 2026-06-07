@@ -87,6 +87,21 @@
             </p>
           </div>
 
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">邀请码</label>
+            <div class="relative">
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">🎫</span>
+              <input
+                v-model="form.inviteCode"
+                type="text"
+                placeholder="请输入邀请码"
+                class="input-field pl-11 uppercase tracking-widest"
+                required
+                autocomplete="off"
+              />
+            </div>
+          </div>
+
           <label class="flex items-start text-sm text-gray-600 cursor-pointer pt-2">
             <input type="checkbox" v-model="form.agree" class="mt-0.5 mr-2 rounded" />
             <span>
@@ -135,6 +150,7 @@ const form = reactive({
   username: '',
   password: '',
   confirm: '',
+  inviteCode: '',
   agree: false
 })
 const loading = ref(false)
@@ -145,6 +161,7 @@ const canSubmit = computed(() =>
   form.username.length >= 3 &&
   form.password.length >= 6 &&
   form.password === form.confirm &&
+  form.inviteCode.trim().length > 0 &&
   form.agree
 )
 
@@ -175,7 +192,8 @@ const handleRegister = async () => {
   try {
     await userStore.register({
       username: form.username,
-      password: form.password
+      password: form.password,
+      inviteCode: form.inviteCode.trim().toUpperCase()
     })
     toast.success('注册成功！正在登录...')
     // 自动登录

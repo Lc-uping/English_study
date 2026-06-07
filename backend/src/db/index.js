@@ -48,7 +48,28 @@ async function init() {
       status TEXT DEFAULT 'new',
       created_at TEXT DEFAULT (datetime('now'))
     );
+
+    CREATE TABLE IF NOT EXISTS invitation_codes (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      code TEXT UNIQUE NOT NULL,
+      used_by INTEGER DEFAULT NULL,
+      created_at TEXT DEFAULT (datetime('now'))
+    );
   `)
+
+  // 检查并注入默认邀请码
+  const codeRes = await client.execute('SELECT COUNT(*) as cnt FROM invitation_codes')
+  const codeCount = Number(codeRes.rows[0]?.cnt || 0)
+  if (codeCount === 0) {
+    const defaultCodes = ['STUDY2026', 'ENGLISH888', 'LEARN999']
+    for (const code of defaultCodes) {
+      await client.execute({
+        sql: 'INSERT INTO invitation_codes (code) VALUES (?)',
+        args: [code]
+      })
+    }
+    console.log(`🎫 已注入 ${defaultCodes.length} 个默认邀请码`)
+  }
 
   // 检查并注入种子单词
   const countRes = await client.execute('SELECT COUNT(*) as cnt FROM words')

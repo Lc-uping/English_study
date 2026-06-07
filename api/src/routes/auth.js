@@ -6,9 +6,12 @@ import { signToken, authMiddleware } from '../middleware/auth.js'
 const router = Router()
 
 router.post('/register', async (req, res) => {
-  const { username, password } = req.body || {}
+  const { username, password, inviteCode } = req.body || {}
   if (!username || !password) {
     return res.status(400).json({ error: '请填写用户名和密码' })
+  }
+  if (!inviteCode) {
+    return res.status(400).json({ error: '请填写邀请码' })
   }
   if (username.length < 3 || username.length > 20) {
     return res.status(400).json({ error: '用户名需 3-20 个字符' })
@@ -16,14 +19,31 @@ router.post('/register', async (req, res) => {
   if (password.length < 6) {
     return res.status(400).json({ error: '密码至少 6 位' })
   }
+
+  // 验证邀请码
+  const codeRow = await db.prepare('SELECT id, used_by FROM invitation_codes WHERE code = ?').get(inviteCode)
+  if (!codeRow) {
+    return res.status(400).json({ error: '邀请码无效' })
+  }
+  if (codeRow.used_by !== null) {
+    return res.status(400).json({ error: '该邀请码已被使用' })
+  }
+
   const exists = await db.prepare('SELECT id FROM users WHERE username = ?').get(username)
   if (exists) {
     return res.status(400).json({ error: '该用户名已被使用' })
   }
   const hash = await bcrypt.hash(password, 10)
+
+  // 使用事务：创建用户 + 标记邀请码已使用
   const result = await db.prepare(
     'INSERT INTO users (username, password) VALUES (?, ?)'
   ).run(username, hash)
+
+  await db.prepare(
+    'UPDATE invitation_codes SET used_by = ? WHERE id = ?'
+  ).run(result.lastInsertRowid, codeRow.id)
+
   const user = { id: result.lastInsertRowid, username, avatar: '🧑‍🎓' }
   const token = signToken({ id: user.id, username })
   res.json({ success: true, token, user })
@@ -52,5 +72,35 @@ router.get('/me', authMiddleware, async (req, res) => {
 router.post('/logout', (req, res) => {
   res.json({ success: true })
 })
+
+// 生成邀请码（管理员接口，需要登录）
+router.post('/invite-code', authMiddleware, async (req, res) => {
+  const { count } = req.body || {}
+  const num = Math.min(parseInt(count) || 1, 50)
+  const codes = []
+  for (let i = 0; i < num; i++) {
+    const code = generateInviteCode()
+    await db.prepare('INSERT INTO invitation_codes (code) VALUES (?)').run(code)
+    codes.push(code)
+  }
+  res.json({ success: true, codes })
+})
+
+// 查看邀请码使用情况（管理员接口，需要登录）
+router.get('/invite-codes', authMiddleware, async (req, res) => {
+  const rows = await db.prepare(
+    'SELECT code, used_by, created_at FROM invitation_codes ORDER BY created_at DESC'
+  ).all()
+  res.json({ codes: rows })
+})
+
+function generateInviteCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+  let code = ''
+  for (let i = 0; i < 8; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length))
+  }
+  return code
+}
 
 export default router
