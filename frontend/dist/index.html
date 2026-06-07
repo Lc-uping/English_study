@@ -8,9 +8,21 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="format-detection" content="telephone=no" />
+    <!-- 预连接关键资源 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- DNS 预解析 -->
+    <link rel="dns-prefetch" href="//fonts.googleapis.com" />
     <title>单词之旅 · English Study</title>
-    <script type="module" crossorigin src="/assets/index-i3TS3__f.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-B4OfDFC4.css">
+    <!-- 预加载关键 CSS -->
+    <style>
+      /* 内联首屏关键样式，避免白屏 */
+      body { margin: 0; background: #f0f4ff; }
+      #app { min-height: 100vh; }
+    </style>
+    <script type="module" crossorigin src="/assets/js/index-DutE-vvY.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/js/vendor-B181WJAk.js">
+    <link rel="stylesheet" crossorigin href="/assets/css/index-B4OfDFC4.css">
   </head>
   <body>
     <div id="app"></div>
