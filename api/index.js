@@ -1,10 +1,10 @@
 import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
-import authRoutes from './src/routes/auth.js'
-import wordRoutes from './src/routes/words.js'
-import aiRoutes from './src/routes/ai.js'
-import db from './src/db/index.js'
+import authRoutes from '../backend/src/routes/auth.js'
+import wordRoutes from '../backend/src/routes/words.js'
+import aiRoutes from '../backend/src/routes/ai.js'
+import db from '../backend/src/db/index.js'
 
 const app = express()
 
